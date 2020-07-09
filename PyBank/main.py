@@ -13,15 +13,28 @@ with open(budget_data, 'r') as csvfile:
     for row in csvreader:
         months[row[0]] = int(row[1])
 
+# calculate difference in profit/loss for each month
+month_by_month_differences = {}
+first_month = True
+for month, monthly_total in months.items():
+    # need to skip first month because we do not know previous month's profit/loss
+    if first_month:
+        first_month = False
+        last_month_total = monthly_total
+        continue
+    month_by_month_differences[month] = monthly_total - last_month_total
+    last_month_total = monthly_total
+
 # calculate totals
 total_months = len(months)
 total_amount = sum(months.values())
 total_amount_formatted = '${:,.0f}'.format(total_amount)
-average = '${:,.2f}'.format(total_amount / total_months)
-profit_month = max(months, key=months.get)
-profit_value = '${:,.0f}'.format(months[profit_month])
-loss_month = min(months, key=months.get)
-loss_value = '${:,.0f}'.format(months[loss_month])
+monthly_change_total = sum(month_by_month_differences.values())
+average = '${:,.2f}'.format(monthly_change_total / (total_months - 1))
+profit_month = max(month_by_month_differences, key=months.get)
+profit_value = '${:,.0f}'.format(month_by_month_differences[profit_month])
+loss_month = min(month_by_month_differences, key=months.get)
+loss_value = '${:,.0f}'.format(month_by_month_differences[loss_month])
 
 # write results to terminal
 print('\n')
