@@ -5,21 +5,24 @@ import csv
 election_data = os.path.join('Resources', 'election_data.csv')
 results_file_path = os.path.join('analysis', 'results.txt')
 
-a = 0
+# read csv file into dictionary
 votes = {}
 with open(election_data, 'r') as csvfile:
     csvreader = csv.reader(csvfile, delimiter=',')
     csv_header = next(csvreader)
-    print(f"CSV Header:  {csv_header}")
     for row in csvreader:
         votes[row[0]] = row[2]
 
-# calculate totals
+# calculate some totals
 total_votes = len(votes)
 receiving_votes = set(votes.values())
+
+# candidates with all their voters in a list
 candidates = {}
 for receiver_of_votes in receiving_votes:
     candidates[receiver_of_votes] = [voter for voter,cand in votes.items() if cand == receiver_of_votes]
+
+# candidates with just total votes    
 candidate_totals = {}
 for candidate, list_of_voters in candidates.items():
     candidate_totals[candidate] = len(list_of_voters)
@@ -31,9 +34,9 @@ print('Election Results')
 print('-----------------------------------')
 print(f'Total Votes: {total_votes}')
 print('-----------------------------------')
-for candidate, voters in candidates.items():
-    average = '{:.3%}'.format(len(voters) / total_votes)
-    print(f'{candidate}: {average} ({len(voters)})')
+for candidate, candidate_total in candidate_totals.items():
+    average = '{:.3%}'.format(candidate_total / total_votes)
+    print(f'{candidate}: {average} ({candidate_total})')
 print('-----------------------------------')
 print(f'Winner: {winner}')
 print('-----------------------------------')
@@ -45,9 +48,9 @@ with open(results_file_path, 'w') as results:
     results.write('-----------------------------------\n')
     results.write(f'Total Votes: {total_votes}\n')
     results.write('-----------------------------------\n')
-    for candidate, voters in candidates.items():
-        average = '{:.3%}'.format(len(voters) / total_votes)
-        results.write(f'{candidate}: {average} ({len(voters)})\n')
+    for candidate, candidate_total in candidate_totals.items():
+        average = '{:.3%}'.format(candidate_total / total_votes)
+        results.write(f'{candidate}: {average} ({candidate_total})\n')
     results.write('-----------------------------------\n')
     results.write(f'Winner: {winner}\n')
     results.write('-----------------------------------\n')
